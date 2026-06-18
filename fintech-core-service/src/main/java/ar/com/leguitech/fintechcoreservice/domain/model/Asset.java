@@ -41,7 +41,7 @@ public class Asset {
      * Unique trading symbol of the financial instrument (e.g., "AAPL", "AL30", "KO").
      * Acts as the strict natural identity of this domain entity.
      */
-    @lombok.EqualsAndHashCode.Include
+    @EqualsAndHashCode.Include
     String ticker;
 
     /**
@@ -81,18 +81,7 @@ public class Asset {
      * @throws IllegalArgumentException if any string parameters are blank or object parameters are null.
      */
     public static Asset createNew(String ticker, String name, AssetType type, Money lastPrice) {
-        if (ticker == null || ticker.isBlank()) {
-            throw new IllegalArgumentException("Ticker cannot be null or empty");
-        }
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Asset name cannot be null or empty");
-        }
-        if (type == null) {
-            throw new IllegalArgumentException("Asset type must be specified");
-        }
-        if (lastPrice == null) {
-            throw new IllegalArgumentException("Initial market price must not be null");
-        }
+        validateInputOrThrow(ticker, name, type, lastPrice);
 
         return new Asset(
                 ticker.trim().toUpperCase(),
@@ -103,4 +92,17 @@ public class Asset {
         );
     }
 
+    private static void validateInputOrThrow(String ticker, String name, AssetType type, Money lastPrice) {
+        if (ticker == null || ticker.isBlank())
+            throw new IllegalArgumentException("Ticker cannot be null or empty");
+
+        if (name == null || name.isBlank())
+            throw new IllegalArgumentException("Asset name cannot be null or empty");
+
+        if (type == null)
+            throw new IllegalArgumentException("Asset type must be specified");
+
+        if (lastPrice == null)
+            throw new IllegalArgumentException("Initial market price must not be null");
+    }
 }
