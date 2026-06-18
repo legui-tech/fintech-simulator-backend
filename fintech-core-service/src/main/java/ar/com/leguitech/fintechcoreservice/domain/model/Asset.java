@@ -1,5 +1,6 @@
 package ar.com.leguitech.fintechcoreservice.domain.model;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
@@ -32,6 +33,7 @@ import java.time.OffsetDateTime;
  * @since 2026-06
  */
 @Value
+@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Asset {
 
@@ -101,21 +103,4 @@ public class Asset {
         );
     }
 
-    /**
-     * Static factory method used by infrastructure adapters to rehydrate an existing
-     * asset from persistent storage.
-     * <p>
-     * Honors the historical pricing data and timeline logs exactly as retrieved from the database.
-     * </p>
-     *
-     * @param ticker    historical trading symbol.
-     * @param name      persisted corporate name.
-     * @param type      persisted asset class category.
-     * @param lastPrice last historically recorded market price with its currency.
-     * @param updatedAt historical timestamp of the last price update.
-     * @return a reconstructive {@link Asset} instance true to the infrastructure records.
-     */
-    public static Asset restore(String ticker, String name, AssetType type, Money lastPrice, OffsetDateTime updatedAt) {
-        return new Asset(ticker, name, type, lastPrice, updatedAt);
-    }
 }

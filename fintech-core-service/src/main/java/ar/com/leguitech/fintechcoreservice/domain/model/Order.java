@@ -1,5 +1,6 @@
 package ar.com.leguitech.fintechcoreservice.domain.model;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 
@@ -34,6 +35,7 @@ import java.util.UUID;
  * @since 2026-06
  */
 @Value
+@Builder
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Order {
 
@@ -142,26 +144,4 @@ public class Order {
             throw new IllegalArgumentException("Price must be strictly greater than zero");
     }
 
-    /**
-     * Static factory method used exclusively by infrastructure adapters to rehydrate
-     * an existing order from persistent storage.
-     * <p>
-     * Unlike {@link #createNew}, this method honors historical identity and the original
-     * lifecycle state exactly as retrieved from the database.
-     * </p>
-     *
-     * @param id          historical unique identifier.
-     * @param accountId   associated ledger account.
-     * @param ticker      financial asset traded.
-     * @param side        operational direction of the trade.
-     * @param quantity    historical quantity of nominals.
-     * @param price       historical execution unit price.
-     * @param totalAmount historically recorded consolidated total amount.
-     * @param status      persisted state of the order.
-     * @param createdAt   original creation timestamp.
-     * @return a reconstructive {@link Order} instance true to the infrastructure records.
-     */
-    public static Order restore(String id, String accountId, String ticker, OrderSide side, BigDecimal quantity, Money price, Money totalAmount, OrderStatus status, OffsetDateTime createdAt) {
-        return new Order(id, accountId, ticker, side, quantity, price, totalAmount, status, createdAt);
-    }
 }

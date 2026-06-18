@@ -144,7 +144,7 @@ class OrderTest {
     }
 
     @Test
-    void restoreOrder_shouldReturnValidOrder() {
+    void builder_shouldRehydrateValidOrder() {
         String id = "some-uuid";
         String accountId = "testAccount123";
         String ticker = "GOOG";
@@ -155,7 +155,17 @@ class OrderTest {
         OrderStatus status = OrderStatus.COMPLETED;
         OffsetDateTime createdAt = OffsetDateTime.now(ZoneOffset.UTC).minusDays(1);
 
-        Order order = Order.restore(id, accountId, ticker, side, quantity, price, totalAmount, status, createdAt);
+        Order order = Order.builder()
+                .id(id)
+                .accountId(accountId)
+                .ticker(ticker)
+                .side(side)
+                .quantity(quantity)
+                .price(price)
+                .totalAmount(totalAmount)
+                .status(status)
+                .createdAt(createdAt)
+                .build();
 
         assertNotNull(order);
         assertEquals(id, order.getId());

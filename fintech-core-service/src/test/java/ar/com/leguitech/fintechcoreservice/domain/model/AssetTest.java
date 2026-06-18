@@ -80,14 +80,20 @@ class AssetTest {
     }
 
     @Test
-    void restore_shouldReturnValidAsset() {
+    void builder_shouldRehydrateValidAsset() {
         String ticker = "GOOG";
         String name = "Alphabet Inc.";
         AssetType type = AssetType.STOCK;
         Money lastPrice = Money.of(new BigDecimal("2500.75"), "USD");
         OffsetDateTime updatedAt = OffsetDateTime.now(ZoneOffset.UTC).minusDays(1);
 
-        Asset asset = Asset.restore(ticker, name, type, lastPrice, updatedAt);
+        Asset asset = Asset.builder()
+                .ticker(ticker)
+                .name(name)
+                .type(type)
+                .lastPrice(lastPrice)
+                .updatedAt(updatedAt)
+                .build();
 
         assertNotNull(asset);
         assertEquals(ticker, asset.getTicker());
