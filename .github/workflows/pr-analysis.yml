@@ -72,5 +72,6 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: >
           mvn -B clean verify sonar:sonar
+          -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
           -Dsonar.projectKey=${{ matrix.module }}
           -Dsonar.projectName=${{ matrix.module }}
