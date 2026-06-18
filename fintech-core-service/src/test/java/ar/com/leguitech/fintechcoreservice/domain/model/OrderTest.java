@@ -1,10 +1,14 @@
 package ar.com.leguitech.fintechcoreservice.domain.model;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,24 +37,18 @@ class OrderTest {
         assertEquals(ZoneOffset.UTC, order.getCreatedAt().getOffset()); // Check UTC offset
     }
 
-    @Test
-    void createNewOrder_shouldThrowException_whenAccountIdIsNull() {
-        String accountId = null;
-        String ticker = "AAPL";
-        OrderSide side = OrderSide.BUY;
-        BigDecimal quantity = BigDecimal.TEN;
-        Money price = Money.of(BigDecimal.valueOf(150.50));
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                Order.createNew(accountId, ticker, side, quantity, price));
-
-        assertEquals("Account ID cannot be null or empty", exception.getMessage());
+    static Stream<Arguments> invalidAccountIdAndTicker() {
+        return Stream.of(
+                Arguments.of(null, "AAPL", "Account ID cannot be null or empty"),
+                Arguments.of("   ", "AAPL", "Account ID cannot be null or empty"),
+                Arguments.of("testAccount123", null, "Ticker cannot be null or empty"),
+                Arguments.of("testAccount123", "   ", "Ticker cannot be null or empty")
+        );
     }
 
-    @Test
-    void createNewOrder_shouldThrowException_whenAccountIdIsBlank() {
-        String accountId = "   ";
-        String ticker = "AAPL";
+    @ParameterizedTest
+    @MethodSource("invalidAccountIdAndTicker")
+    void createNewOrder_shouldThrowException_whenAccountIdOrTickerIsBlank(String accountId, String ticker, String expectedMessage) {
         OrderSide side = OrderSide.BUY;
         BigDecimal quantity = BigDecimal.TEN;
         Money price = Money.of(BigDecimal.valueOf(150.50));
@@ -58,35 +56,7 @@ class OrderTest {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 Order.createNew(accountId, ticker, side, quantity, price));
 
-        assertEquals("Account ID cannot be null or empty", exception.getMessage());
-    }
-
-    @Test
-    void createNewOrder_shouldThrowException_whenTickerIsNull() {
-        String accountId = "testAccount123";
-        String ticker = null;
-        OrderSide side = OrderSide.BUY;
-        BigDecimal quantity = BigDecimal.TEN;
-        Money price = Money.of(BigDecimal.valueOf(150.50));
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                Order.createNew(accountId, ticker, side, quantity, price));
-
-        assertEquals("Ticker cannot be null or empty", exception.getMessage());
-    }
-
-    @Test
-    void createNewOrder_shouldThrowException_whenTickerIsBlank() {
-        String accountId = "testAccount123";
-        String ticker = "   ";
-        OrderSide side = OrderSide.BUY;
-        BigDecimal quantity = BigDecimal.TEN;
-        Money price = Money.of(BigDecimal.valueOf(150.50));
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                Order.createNew(accountId, ticker, side, quantity, price));
-
-        assertEquals("Ticker cannot be null or empty", exception.getMessage());
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test

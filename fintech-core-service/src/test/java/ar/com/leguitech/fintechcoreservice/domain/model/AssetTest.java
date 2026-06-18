@@ -1,10 +1,14 @@
 package ar.com.leguitech.fintechcoreservice.domain.model;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,56 +32,25 @@ class AssetTest {
         assertEquals(ZoneOffset.UTC, asset.getUpdatedAt().getOffset());
     }
 
-    @Test
-    void createNew_shouldThrowException_whenTickerIsNull() {
-        String ticker = null;
-        String name = "Apple Inc.";
-        AssetType type = AssetType.STOCK;
-        Money lastPrice = Money.of(new BigDecimal("150.50"), "USD");
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                Asset.createNew(ticker, name, type, lastPrice));
-
-        assertEquals("Ticker cannot be null or empty", exception.getMessage());
+    static Stream<Arguments> invalidTickerAndName() {
+        return Stream.of(
+                Arguments.of(null, "Apple Inc.", "Ticker cannot be null or empty"),
+                Arguments.of("   ", "Apple Inc.", "Ticker cannot be null or empty"),
+                Arguments.of("AAPL", null, "Asset name cannot be null or empty"),
+                Arguments.of("AAPL", "   ", "Asset name cannot be null or empty")
+        );
     }
 
-    @Test
-    void createNew_shouldThrowException_whenTickerIsBlank() {
-        String ticker = "   ";
-        String name = "Apple Inc.";
+    @ParameterizedTest
+    @MethodSource("invalidTickerAndName")
+    void createNew_shouldThrowException_whenTickerOrNameIsBlank(String ticker, String name, String expectedMessage) {
         AssetType type = AssetType.STOCK;
         Money lastPrice = Money.of(new BigDecimal("150.50"), "USD");
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 Asset.createNew(ticker, name, type, lastPrice));
 
-        assertEquals("Ticker cannot be null or empty", exception.getMessage());
-    }
-
-    @Test
-    void createNew_shouldThrowException_whenNameIsNull() {
-        String ticker = "AAPL";
-        String name = null;
-        AssetType type = AssetType.STOCK;
-        Money lastPrice = Money.of(new BigDecimal("150.50"), "USD");
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                Asset.createNew(ticker, name, type, lastPrice));
-
-        assertEquals("Asset name cannot be null or empty", exception.getMessage());
-    }
-
-    @Test
-    void createNew_shouldThrowException_whenNameIsBlank() {
-        String ticker = "AAPL";
-        String name = "   ";
-        AssetType type = AssetType.STOCK;
-        Money lastPrice = Money.of(new BigDecimal("150.50"), "USD");
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                Asset.createNew(ticker, name, type, lastPrice));
-
-        assertEquals("Asset name cannot be null or empty", exception.getMessage());
+        assertEquals(expectedMessage, exception.getMessage());
     }
 
     @Test
